@@ -48,6 +48,11 @@ class People(db.Model):
             "species": self.species,
         }
 
+    def __repr__(self):
+            return f'<People {self.name}>'
+
+
+
 # Definimos la clase Planet
 class Planet(db.Model):
     __tablename__ = 'planet'
@@ -65,12 +70,15 @@ class Planet(db.Model):
             "climate": self.climate,
             "terrain": self.terrain,
         }
+    
+    def __repr__(self):
+        return f'<Planet {self.name}>'
 
 # Definimos la clase Favorites, que relaciona a los usuarios con sus personajes y planetas favoritos
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     people_id = db.Column(db.Integer, db.ForeignKey('people.id'))
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))
 
@@ -82,4 +90,7 @@ class Favorites(db.Model):
             "people_id": self.people_id,
             "planet_id": self.planet_id,
         }
+    
+    def __repr__(self):
+        return f'<Favorites {self.id}>'
 
