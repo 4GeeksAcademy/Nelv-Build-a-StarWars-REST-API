@@ -15,7 +15,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     subscription_date = db.Column(db.String(25), nullable=False)
 
-    favorite = db.relationship('Favorites', backref = 'user')
+    favorites = db.relationship('Favorites', backref = 'user')
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -38,7 +38,7 @@ class People(db.Model):
     gender = db.Column(db.String(25), nullable=False)
     species = db.Column(db.String(25), nullable=False)
 
-    favorite = db.relationship('Favorites', backref = 'people')
+    favorites = db.relationship('Favorites', backref = 'people')
 
     def serialize(self):
         return {
@@ -61,7 +61,7 @@ class Planet(db.Model):
     climate = db.Column(db.String(25), nullable=False)
     terrain = db.Column(db.String(30), nullable=False)
 
-    favorite = db.relationship('Favorites', backref = 'planet')
+    favorites = db.relationship('Favorites', backref = 'planet')
 
     def serialize(self):
         return {

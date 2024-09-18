@@ -78,17 +78,25 @@ def get_planets():
     planets_list = [planet.serialize() for planet in planets]
     return jsonify(planets_list), 200
 
+
+
 # Muestra la información de un solo planeta según su id.
 
-# @app.route('/planets/<int:planet_id>', methods=['GET'])
-# def get_planet(planets_id):
-#     planets_query = Planet.query.filter_by(id = planets_id).first()
-#     if planets_query:
-#         response_body = {
-#         'message': 'Planeta encontrado';
-#         'planet': planets_query.serialize()
-#     }
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+    planet_query = Planet.query.filter_by(id = planet_id).first()
+    if planet_query:
+        response_body = {
+            'message': 'Planeta encontrado',
+            'planet': planet_query.serialize()
+        }
+        return jsonify(response_body), 200
 
+    else:
+        response_body = {
+            'message': 'Planeta no encontrado'
+        }
+        return jsonify(response_body), 404
 
 
 
@@ -121,7 +129,7 @@ def get_user(user_id):
         return jsonify(response_body), 400
     
 
-#  Añade un nuevo planet favorito al usuario actual con el id = planet_id.
+#  Añade un nuevo planeta favorito al usuario actual con el id = planet_id.
 
 @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
 def add_favorite_planet(planet_id):
@@ -130,7 +138,7 @@ def add_favorite_planet(planet_id):
 
     if user_id is None:
         return jsonify ({
-            'msg': 'User Id requerido'
+            'msg': 'Usuario Id requerido'
         }), 400
     user = User.query.get(user_id)
     if user is None:
@@ -156,8 +164,49 @@ def add_favorite_planet(planet_id):
     return jsonify ({
             'msg': 'Se añadió a favoritos'
         }), 200
+    
+
+@app.route('/favorite/people/<int:people_id>', methods=['POST'])
+def favorite_people(people_id):
+    body = request.get_json()
+    user_id = body.get('user_id', None)
+
+    if user_id is None:
+        return jsonify({
+            'msg': 'Usuario Id requerido'
+        }), 400
+    
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({
+            'msg': 'Usuario no encontrado'
+        }), 400
+    
+    people = People.query.get(people_id)
+    if people is None:
+        return jsonify({
+            'msg': 'Personaje no encontrado'
+        }), 400
+    
+    exist_favorite = Favorites.query.filter_by(user_id=user_id, people_id=people_id).first()
+    if exist_favorite:
+        return jsonify({
+            'msg': 'El personaje ya está en favoritos'
+        }), 400
+    
+    new_favorite = Favorites(user_id=user_id, people_id=people_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({
+    'msg': 'Se añadio el personaje a favoritos'
+    }), 200
+        
 
 
+
+    
+    
     
 
 
