@@ -166,6 +166,51 @@ def add_favorite_planet(planet_id):
         }), 200
     
 
+# [GET] /users/favorites Listar todos los favoritos que pertenecen al usuario actual.
+
+@app.route('/users/<int:user_id>/favorites', methods=['GET'])
+def get_favorites(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({
+            'msg': 'Usuario no encontrado'
+        }), 404
+    
+    # Obtener todos los favoritos de este usuario
+    favorites = Favorites.query.filter_by(user_id=user_id).all()
+
+    # Verificamos si hay favoritos
+    if not favorites:
+        return jsonify({
+            'msg': 'No hay favoritos'
+        }), 200
+    
+    # Crear una lista para almacenar los favoritos
+    favorite_list = []
+
+    for favorite in favorites:
+        if favorite.people_id is not None:
+            people = People.query.get(favorite.people_id)
+            favorite_list.append({
+                'type': 'person',
+                'details': people.serialize()
+            })
+        
+        if favorite.planet_id is not None:
+            planet = Planet.query.get(favorite.planet_id)
+            favorite_list.append({
+                'type': 'planet',
+                'details': planet.serialize()
+            })
+
+    # Devolver la lista de favoritos en formato JSON
+    return jsonify({
+        'msg': 'Favoritos encontrados',
+        'favorites': favorite_list
+    }), 200
+    
+
+
 @app.route('/favorite/people/<int:people_id>', methods=['POST'])
 def favorite_people(people_id):
     body = request.get_json()
