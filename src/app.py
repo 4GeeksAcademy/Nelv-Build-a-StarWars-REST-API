@@ -318,6 +318,99 @@ def delete_favorite_people(people_id):
         return jsonify(response_body), 404
 
 
+# Crear un nuevo personaje.
+@app.route('/people', methods=['POST'])
+def create_character():
+    body = request.get_json()
+    if not body.get('name') or not body.get('gender') or not body.get('species'):
+        return jsonify({
+            'msg': 'Faltan datos'
+        }), 400
+    new_character = People(name=body['name'], gender=body['gender'], species=body['species'])
+    db.session.add(new_character)
+    db.session.commit()
+    return jsonify(new_character.serialize()), 201
+
+
+
+# Crear nuevo planeta.
+
+@app.route('/planet', methods=['POST'])
+def create_planet():
+    body = request.get_json()
+    if not body.get('name') or not body.get('climate') or not body.get('terrain'):
+        return jsonify({
+            'msg': 'Faltan datos'
+        }), 400
+    new_planet = Planet(name=body['name'], climate=body['climate'], terrain=body['terrain'])
+    db.session.add(new_planet)
+    db.session.commit()
+    return jsonify(new_planet.serialize()), 201
+
+
+# Editar personaje:
+
+@app.route('/people/<int:people_id>', methods=['PUT'])
+def update_character(people_id):
+    body = request.get_json()
+    character = People.query.get(people_id)
+    if not character:
+        return jsonify({
+            'msg': 'Personaje no encontrado'
+        }), 404
+    character.name = body.get('name', character.name)
+    character.gender = body.get('gender', character.gender)
+    character.species = body.get('species', character.species)
+    db.session.commit()
+    return jsonify(character.serialize()), 200
+
+
+# Editar planeta:
+
+@app.route('/planet/<int:planet_id>', methods=['PUT'])
+def update_planet(planet_id):
+    body = request.get_json()
+    planet = Planet.query.get(planet_id)
+    if not planet:
+        return jsonify({
+            'msg': 'Planeta no encontrado'
+        }), 404
+    planet.name = body.get('name', planet.name)
+    planet.climate = body.get('climate', planet.climate)
+    planet.terrain = body.get('terrain', planet.terrain)
+    db.session.commit()
+    return jsonify(planet.serialize()), 200
+
+
+# Delete personaje:
+@app.route('/people/<int:people_id>', methods=['DELETE'])
+def delete_character(people_id):
+    character = People.query.get(people_id)
+    if not character:
+        return jsonify({
+            'msg': 'Personaje no encontrado'
+        }), 404
+    db.session.delete(character)
+    db.session.commit()
+    return jsonify({
+        'msg': 'Personaje eliminado con éxito'
+    }), 200
+
+# Delete planeta:
+@app.route('/planet/<int:planet_id>', methods=['DELETE'])
+def delete_planet(planet_id):
+    planet = Planet.query.get(planet_id)
+    if not planet:
+        return jsonify({
+            'msg': 'Planeta no encontrado'
+        }), 404
+    db.session.delete(planet)
+    db.session.commit()
+    return jsonify({
+        'msg': 'Planeta eliminado con éxito'
+    }), 200
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
